@@ -1,0 +1,47 @@
+version: '3'
+services:
+    server:
+        # image: bbf-worker:latest
+        # image: localhost:5000/bbf-worker
+        image: localhost:5000/tf-bfarm
+        deploy:
+          replicas: 1
+        #   placement:
+            # constraints:
+            #  - node.hostname == 192.168.54.241
+        # volumes:
+        #    - ${BAZEL_CACHEDIR}:/data
+        ports:
+            - "8980:8980"
+        entrypoint: /bbf_entry.sh
+        command: server
+
+    worker:
+        # image: bbf-worker:latest
+        # image: localhost:5000/bbf-worker
+        image: localhost:5000/tf-bfarm
+        depends_on:
+          - server
+        deploy:
+          replicas: 2
+        entrypoint: /bbf_entry.sh
+        command: worker_release
+
+    # copile:
+    #     image: localhost:5000/tf-bfarm
+    #     depends_on:
+    #       - server
+    #       - worker
+    #     deploy:
+    #       replicas: 1
+    #     cap_add:
+    #         - SYS_PTRACE
+    #     security_opt:
+    #         - seccomp:unconfined
+    #     entrypoint: /bin/bash
+    #     working_dir: /tensorflow
+    #     command: -c './configure <<< y; bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package --spawn_strategy=remote --genrule_strategy=remote --strategy=Javac=remote --strategy=Closure=remote --remote_executor=server:8980 --verbose_failures'
+
+
+
+
